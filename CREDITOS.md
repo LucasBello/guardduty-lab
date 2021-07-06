@@ -1,4 +1,4 @@
-Bibliografia:
+Bibliografia e referencias:
 
 [Amazon Guardduty](https://github.com/awslabs/amazon-guardduty-tester)
 
