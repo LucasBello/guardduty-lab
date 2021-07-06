@@ -94,6 +94,29 @@
         }        
     },
     "Conditions": {
+        "GovCloudCondition": {
+            "Fn::Equals": [
+                {
+                    "Ref": "AWS::Region"
+                },
+                "us-gov-west-1"
+            ]
+        },
+       "NATInstanceCondition": {
+            "Fn::Equals": [
+                {
+                    "Ref": "AWS::Region"
+                },
+                "us-gov-west-1"
+            ]
+        },
+        "NATGatewayCondition": {
+            "Fn::Not": [
+                {
+                    "Condition": "GovCloudCondition"
+                }
+            ]
+        },
 	"NVirginiaRegionCondition": {
             "Fn::Equals": [
                 {
@@ -148,7 +171,6 @@
             "Properties": {
                 "DomainName": {
                 "Fn::If": [
-                   
                     "NVirginiaRegionCondition",
                     "ec2.internal",
                     {
@@ -486,7 +508,7 @@
             "Condition": "NATInstanceCondition",
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "GroupDescription": "Permite o acesso de saida a Internet para o VPC por meio das instancias NAT",
+                "GroupDescription": "Enables outbound internet access for the VPC via the NAT instances",
                 "VpcId": {
                     "Ref": "VPC"
                 },
@@ -720,7 +742,7 @@
         "BastionSecurityGroup": {
 	    "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "GroupDescription": "Permite acesso SSH no SG dos Bastions",
+                "GroupDescription": "Enables SSH Access to Bastion Hosts",
                 "VpcId": {
                     "Ref": "VPC"
                  },
@@ -739,7 +761,7 @@
          "RedTeamSecurityGroup": {
             "Type": "AWS::EC2::SecurityGroup",
             "Properties": {
-                "GroupDescription": "Permite acesso SSH no SG do RedTeam",
+                "GroupDescription": "Enables SSH Access to RedTeam Tools Host",
                  "VpcId": {
                     "Ref": "VPC"
                  },
@@ -950,7 +972,7 @@
             "BasicLinuxSecurityGroup": {
                 "Type": "AWS::EC2::SecurityGroup",
                 "Properties": {
-                    "GroupDescription": "Permite acesso de Admin nos hosts linux basicos",
+                    "GroupDescription": "Enables Admin Access to basic linux hosts",
                      "VpcId": {
                         "Ref": "VPC"
                      },
@@ -1080,7 +1102,7 @@
             "BasicWindowsSecurityGroup": {
                 "Type": "AWS::EC2::SecurityGroup",
                 "Properties": {
-                    "GroupDescription": "Permite acesso de Admin nos hosts Windows basicos",
+                    "GroupDescription": "Enables Admin Access to basic windows hosts",
                      "VpcId": {
                         "Ref": "VPC"
                      },
@@ -1183,13 +1205,13 @@
     },
     "Outputs": {
         "BastionIp": {
-            "Description": "ELC para os Bastions",
+            "Description": "Elastic IP for Bastion",
             "Value": {
                 "Ref": "EIP"
             }
         },
         "RedTeamIp": {
-            "Description": "IP Local para a instancia RedTeam",
+            "Description": "Local IP for RedTeam Instance",
             "Value": {
 	        "Fn::GetAtt" : [ "RedTeam", "PrivateIp" ] 
             }
