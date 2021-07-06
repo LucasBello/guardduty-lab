@@ -643,7 +643,7 @@
                                         [
                                             "/tmp/bastion_bootstrap.sh",
                                             " --banner ",
-					    "https://raw.githubusercontent.com/awslabs/amazon-guardduty-tester/master/artifacts/banner_message.txt",
+					    "https://raw.githubusercontent.com/LucasBello/guarddutty-lab/main/artefatos/banner_message.txt",
                                             " --enable true",
                                             " --tcp-forwarding true",
                                             " --x11-forwarding false"
