@@ -126,7 +126,7 @@ echo 'Teste 5: DNS Exfiltration'
 echo 'Descoberta esperada: EC2 instance ' $RED_TEAM_INSTANCE ' esta tentando consultar nomes de domínio que se assemelham a a dominios de DNS exfiltration'
 echo 'Apontamento: Backdoor:EC2/DNSDataExfiltration'
 echo
-echo 'Test 6: C&C Activity'
+echo 'Teste 6: Comando e Controle'
 echo 'Descoberta esperada: EC2 instance ' $RED_TEAM_INSTANCE ' esta consultando um nome de dominio associado a um servidor de comando e controle '
 echo 'Apontamento: Backdoor:EC2/C&CActivity.B!DNS'
 echo
