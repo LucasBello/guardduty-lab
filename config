@@ -1,0 +1,11 @@
+Host bastion
+    HostName {BastionIp}
+    User ec2-user
+    IdentityFile ~/.ssh/{chave-ssh.pem}}
+Host tester
+    ForwardAgent yes
+    HostName {RedTeamIp}
+    User ec2-user
+    IdentityFile ~/.ssh/{chave-ssh.pem}
+    ProxyCommand ssh bastion nc %h %p
+    ServerAliveInterval 240
