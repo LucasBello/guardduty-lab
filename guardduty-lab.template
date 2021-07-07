@@ -1206,13 +1206,13 @@
     },
     "Outputs": {
         "BastionIp": {
-            "Description": "ELC para os Bastions",
+            "Description": "IP do ELC do Bastion",
             "Value": {
                 "Ref": "EIP"
             }
         },
         "RedTeamIp": {
-            "Description": "IP Local para a instancia RedTeam",
+            "Description": "IP da instancia RedTeam",
             "Value": {
 	        "Fn::GetAtt" : [ "RedTeam", "PrivateIp" ] 
             }
