@@ -1,136 +1,132 @@
-#Copyright 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#  
-#  Licensed under the Apache License, Version 2.0 (the "License").
-#  You may not use this file except in compliance with the License.
-#  A copy of the License is located at
-#  
-#      http://www.apache.org/licenses/LICENSE-2.0
-#  
-#  or in the "license" file accompanying this file. This file is distributed 
-#  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-#  express or implied. See the License for the specific language governing 
-#  permissions and limitations under the License.
-
 #!/bin/bash
 
-# load IP addresses created by templates
+# Carregar os ips gerados no template
 source localIps.sh
 
-# simulate external recon
-#echo 'External port probe on a temporarily unprotected port'
-
-# 1 - simulate internal recon and attempted lateral movement
+# 1 - Simulando varredura de portas
 echo
 echo '***********************************************************************'
-echo '* Test #1 - Internal port scanning                                    *'
-echo '* This simulates internal reconaissance by an internal actor or an   *'
-echo '* external actor after an initial compromise. This is considered a    *'
-echo '* low priority finding for GuardDuty because its not a clear indicator*'
-echo '* of malicious intent on its own.                                     *'
+echo '* Teste #1 - Varredura de porta interna                               *'
+echo '*                                                                     *'
+echo '* Simula o reconhecimento de uma varredura de portas causada por um   *'
+echo '* autor interno ou externo.                                           *'
+echo '*                                                                     *'
+echo '* Isto sera tratado pelo Guard Duty como uma acao de prioridade baixa *'
+echo '* pois nao se trata de um indicador claro de intencao maliciosa.      *'
 echo '***********************************************************************'
 echo
 sudo nmap -sT $BASIC_LINUX_TARGET
 echo
 echo '-----------------------------------------------------------------------'
 echo
-# 2 - ssh brute force with list of keys found on web
+# 2 - Brute force de SSH com lista de chaves encontradas na internet
 echo '***********************************************************************'
-echo '* Test #2 - SSH Brute Force with Compromised Keys                     *'
-echo '* This simulates an SSH brute force attack on an SSH port that we    *'
-echo '* can access from this instance. It uses (phony) compromised keys in  *'
-echo '* many subsequent attempts to see if one works. This is a common      *'
-echo '* techique where the bad actors will harvest keys from the web in     *'
-echo '* places like source code repositories where people accidentally leave*'
-echo '* keys and credentials (This attempt will not actually succeed in     *'
-echo '* obtaining access to the target linux instance in this subnet)       *'
+echo '* Teste #2 - Brute force de SSH com chaves comprometidas              *'
+echo '*                                                                     *'
+echo '* Simulacao de um Brute Force na porta SSH que pode ser acessada      *'
+echo '* nesta instancia.                                                    *'
+echo '*                                                                     *'
+echo '* Este teste utiliza chaves falsas em sequencia para ver se uma delas *'
+echo '* ocasionalmente acabe funcionando.                                   *'
 echo '***********************************************************************'
 echo
 for j in `seq 1 20`; do sudo ./crowbar/crowbar.py -b sshkey -s $BASIC_LINUX_TARGET/32 -U users -k ./compromised_keys; done
 echo
 echo '-----------------------------------------------------------------------'
 echo
-# 3 - rdp brute force with known user and list of passwords found on web
+# 3 - Brute Force de RDP com lista de usuarios e senhas encontradas na internet
 echo '***********************************************************************'
-echo '* Test #3 - RDP Brute Force with Password List                        *'
-echo '* This simulates an RDP brute force attack on the internal RDP port  *'
-echo '* of the windows server that we installed in the environment.  It uses*'
-echo '* a list of common passwords that can be found on the web. This test  *'
-echo '* will trigger a detection, but will fail to get into the target      *'
-echo '* windows instance.                                                   *'
+echo '* Teste #3 - Brute force RDP com lista de usuarios e senhas           *'
+echo '*                                                                     *'
+echo '* Simulacao de ataque Brute Force na porta de RDP do windows com uma  *'
+echo '* lista de usuarios e senhas comuns.                                  *'
+echo '*                                                                     *'
+echo '* Assim como no teste de SSH, este teste utiliza chaves falsas        *'
+echo '* em sequencia para ver se uma delas ocasionalmente acabe funcionando.*'
 echo '***********************************************************************'
 echo
-echo 'Sending 250 password attempts at the windows server...'
+echo 'Enviando 250 tentativas de senha no servidor windows'
 hydra  -f -L /home/ec2-user/users -P ./passwords/password_list.txt rdp://$BASIC_WINDOWS_TARGET
 echo
 echo '-----------------------------------------------------------------------'
 echo
-# 4 - CryptoCurrency Activity
+# 4 - Mineracao de cripto moedas
 echo '***********************************************************************'
-echo '* Test #4 - CryptoCurrency Mining Activity                            *'
-echo '* This simulates interaction with a cryptocurrency mining pool which *'
-echo '* can be an indication of an instance compromise. In this case, we are*'
-echo '* only interacting with the URL of the pool, but not downloading      *'
-echo '* any files. This will trigger a threat intel based detection.        *'
+echo '* Teste #4 - Atividades de mineracao de Cripto Moedas                *'
+echo '*                                                                     *'
+echo '* O Guard Duty possui uma inteligencia para identificar caso alguma   *'
+echo '* instancia esteja se comunicando com um pool de mineracao           *'
+echo '*                                                                     *'
+echo '* Neste teste faremos apenas uma chamada em uma url do Pool sem baixar*'
+echo '* nenhum tipo de arquivo.                                             *'
+echo '*                                                                     *'
+echo '* Isso sera suficiente para gerar o alerta.                           *'
+echo '*                                                                     *'
 echo '***********************************************************************'
 echo
-echo "Calling bitcoin wallets to download mining toolkits"
+echo "Fazendo chamada nas urls de download dos toolkits das carteiras de bitcoin"
 curl -s http://pool.minergate.com/dkjdjkjdlsajdkljalsskajdksakjdksajkllalkdjsalkjdsalkjdlkasj  > /dev/null &
 curl -s http://xmr.pool.minergate.com/dhdhjkhdjkhdjkhajkhdjskahhjkhjkahdsjkakjasdhkjahdjk  > /dev/null &
 echo
 echo '-----------------------------------------------------------------------'
 echo
-# 5 - DNS Exfiltation 
+# 5 - Simulacao de DNS Exfiltation
 echo '***********************************************************************'
-echo '* Test #5 - DNS Exfiltration                                          *'
-echo '* A common exfiltration technique is to tunnel data out over DNS      *'
-echo '* to a fake domain.  Its an effective technique because most hosts    *'
-echo '* have outbound DNS ports open.  This test wont exfiltrate any data,  *'
-echo '* but it will generate enough unusual DNS activity to trigger the     *'
-echo '* detection.                                                          *'
+echo '* Teste #5 - DNS Exfiltration                                         *'
+echo '*                                                                     *'
+echo '* Uma tecnica comum de criacao de um tunem de dados pelo DNS para um  *'
+echo '* dominio falso.                                                      *'
+echo '* Explorando o fato de a maioria dos hosts ter portas de DNS de saida *'
+echo '* abertas.                                                            *'  
+echo '*                                                                     *'
+echo '* Neste teste nada sera exportado, vamos apenas gerar uma atividade   *'
+echo '* incomum de DNS o suficiente para acionar a deteccao do Guard Duty.  *'
 echo '***********************************************************************'
 echo
-echo "Calling large numbers of large domains to simulate tunneling via DNS" 
+echo "Utilizando o DIG para fazer DNS query em lote" 
 dig -f ./domains/queries.txt > /dev/null &
 echo
 # 6 - Backdoor:EC2/C&CActivity.B!DNS
-echo '***********************************************************************'
-echo '* Test #6 - Fake domain to prove that GuardDuty is working            *'
-echo '* This is a permanent fake domain that customers can use to prove that*'
-echo '* GuardDuty is working.  Calling this domain will always generate the *'
-echo '* Backdoor:EC2/C&CActivity.B!DNS finding type                         *'
+echo '********************************************************************** *'
+echo '* Teste #6 - Simulacao de Comando e Controle                           *'
+echo '*                                                                      *'
+echo '*O Guard Duty tem um domínio para testar uma acção de Backdor de C&C   *'
+echo '*                                                                      *'
+echo '*Este teste faz uma chamada na URL GuardDutyC2ActivityB.com para       *'
+echo '*acionar este apontamento                                             *'
 echo '***********************************************************************'
 echo
-echo "Calling a well known fake domain that is used to generate a known finding"
+echo "Fazendo chamada em GuardDutyC2ActivityB.com para acionar o apontamento"
 dig GuardDutyC2ActivityB.com any
 echo
 echo '*****************************************************************************************************'
-echo 'Expected GuardDuty Findings'
+echo 'Resultados Esperados do GuardDuty'
 echo
-echo 'Test 1: Internal Port Scanning'
-echo 'Expected Finding: EC2 Instance ' $RED_TEAM_INSTANCE ' is performing outbound port scans against remote host.' $BASIC_LINUX_TARGET
-echo 'Finding Type: Recon:EC2/Portscan'
+echo 'Teste 1: Varredura de porta interna'
+echo 'Descoberta esperada: a instância ' $RED_TEAM_INSTANCE ' está realizando varreduras de porta de saida no host remoto. ' $BASIC_LINUX_TARGET
+echo 'Apontamento: Recon:EC2/Portscan'
 echo 
-echo 'Test 2: SSH Brute Force with Compromised Keys'
-echo 'Expecting two findings - one for the outbound and one for the inbound detection'
-echo 'Outbound: ' $RED_TEAM_INSTANCE ' is performing SSH brute force attacks against ' $BASIC_LINUX_TARGET
-echo 'Inbound: ' $RED_TEAM_IP ' is performing SSH brute force attacks against ' $BASIC_LINUX_INSTANCE
-echo 'Finding Type: UnauthorizedAccess:EC2/SSHBruteForce'
+echo 'Teste 2 - Brute force de SSH com chaves comprometidas'
+echo 'Esperando duas descobertas - uma para a deteccao de saida e outra para a deteccao de entrada'
+echo 'Saida: ' $RED_TEAM_INSTANCE ' esta fazendo Brute Force de SSH contra ' $BASIC_LINUX_TARGET
+echo 'Entrada: ' $RED_TEAM_IP ' esta fazendo Brute Force de SSH contra ' $BASIC_LINUX_INSTANCE
+echo 'Apontamento: UnauthorizedAccess:EC2/SSHBruteForce'
 echo
-echo 'Test 3: RDP Brute Force with Password List'
-echo 'Expecting two findings - one for the outbound and one for the inbound detection'
-echo 'Outbound: ' $RED_TEAM_INSTANCE ' is performing RDP brute force attacks against ' $BASIC_WINDOWS_TARGET
-echo 'Inbound: ' $RED_TEAM_IP ' is performing RDP brute force attacks against ' $BASIC_WINDOWS_INSTANCE
-echo 'Finding Type : UnauthorizedAccess:EC2/RDPBruteForce'
+echo 'Teste 3: Brute force RDP com lista de usuarios e senhas '
+echo 'Esperando duas descobertas - uma para a deteccao de saida e outra para a deteccao de entrada'
+echo 'Saida: ' $RED_TEAM_INSTANCE ' esta fazendo Brute Force de RDP contra ' $BASIC_WINDOWS_TARGET
+echo 'Entrada: ' $RED_TEAM_IP ' esta fazendo Brute Force de RDP contra ' $BASIC_WINDOWS_INSTANCE
+echo 'Apontamento: UnauthorizedAccess:EC2/RDPBruteForce'
 echo
-echo 'Test 4: Cryptocurrency Activity'
-echo 'Expected Finding: EC2 Instance ' $RED_TEAM_INSTANCE ' is querying a domain name that is associated with bitcoin activity'
-echo 'Finding Type : CryptoCurrency:EC2/BitcoinTool.B!DNS'
+echo 'Teste 4: Atividades de mineracao de Cripto Moedas  '
+echo 'Descoberta esperada: EC2 Instance ' $RED_TEAM_INSTANCE ' esta consultando um nome de dominio associado a atividade de bitcoin'
+echo 'Apontamento: CryptoCurrency:EC2/BitcoinTool.B!DNS'
 echo
-echo 'Test 5: DNS Exfiltration'
-echo 'Expected Finding: EC2 instance ' $RED_TEAM_INSTANCE ' is attempting to query domain names that resemble exfiltrated data'
-echo 'Finding Type : Backdoor:EC2/DNSDataExfiltration'
+echo 'Teste 5: DNS Exfiltration'
+echo 'Descoberta esperada: EC2 instance ' $RED_TEAM_INSTANCE ' esta tentando consultar nomes de domínio que se assemelham a a dominios de DNS exfiltration'
+echo 'Apontamento: Backdoor:EC2/DNSDataExfiltration'
 echo
 echo 'Test 6: C&C Activity'
-echo 'Expected Finding: EC2 instance ' $RED_TEAM_INSTANCE ' is querying a domain name associated with a known Command & Control server. '
-echo 'Finding Type : Backdoor:EC2/C&CActivity.B!DNS'
+echo 'Descoberta esperada: EC2 instance ' $RED_TEAM_INSTANCE ' esta consultando um nome de dominio associado a um servidor de comando e controle '
+echo 'Apontamento: Backdoor:EC2/C&CActivity.B!DNS'
 echo
