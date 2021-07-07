@@ -186,8 +186,8 @@
                         }
                     },
                     {
-                        "Key" : "CreatedBy",
-                        "Value" : "GuardDuty Test Script"
+                        "Key" : "CriadoPor",
+                        "Value" : "github|LucasBello|guarddutty-lab"
                     }
                 ]
             }
@@ -252,8 +252,8 @@
                         "Value": "Private"
                     },
                     {
-                        "Key" : "CreatedBy",
-                        "Value" : "GuardDuty Test Script"
+                        "Key" : "CriadoPor",
+                        "Value" : "github|LucasBello|guarddutty-lab"
                     }
                 ]
             }
@@ -285,8 +285,8 @@
                         "Value": "Public"
                     },
                     {
-                        "Key" : "CreatedBy",
-                        "Value" : "GuardDuty Test Script"
+                        "Key" : "CriadoPor",
+                        "Value" : "github|LucasBello|guarddutty-lab"
                     }
                 ],
                 "MapPublicIpOnLaunch": true
@@ -449,8 +449,8 @@
                         "Value": "NAT"
                     },
                     {
-                        "Key" : "CreatedBy",
-                        "Value" : "GuardDuty Test Script"
+                        "Key" : "CriadoPor",
+                        "Value" : "github|LucasBello|guarddutty-lab"
                     }
                 ],
                 "NetworkInterfaces": [
@@ -618,8 +618,8 @@
                         "PropagateAtLaunch": "true"
                     },
                     {
-                        "Key" : "CreatedBy",
-                        "Value" : "GuardDuty Test Script",
+                        "Key" : "CriadoPor",
+                        "Value" : "github|LucasBello|guarddutty-lab",
                         "PropagateAtLaunch": "true"
                     }
                 ]
@@ -942,8 +942,8 @@
                           "Value" : "RedTeam"
                        },
                        {
-                           "Key" : "CreatedBy",
-                           "Value" : "GuardDuty Test Script"
+                           "Key" : "CriadoPor",
+                           "Value" : "github|LucasBello|guarddutty-lab"
                        } ]
                 }                 
             },
@@ -1071,8 +1071,8 @@
                           "Value" : "BasicLinuxTarget"
                        },
                        {
-                           "Key" : "CreatedBy",
-                           "Value" : "GuardDuty Test Script"
+                           "Key" : "CriadoPor",
+                           "Value" : "github|LucasBello|guarddutty-lab"
                        } ]
                                  
 		}
@@ -1175,8 +1175,8 @@
                           "Value" : "BasicWindowsTarget"
                        },
                        {
-                           "Key" : "CreatedBy",
-                           "Value" : "GuardDuty Test Script"
+                           "Key" : "CriadoPor",
+                           "Value" : "github|LucasBello|guarddutty-lab"
                        } ]                                 
 		}
             }
