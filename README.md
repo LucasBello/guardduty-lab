@@ -1,6 +1,9 @@
 # Laboratório para o Guard Duty
 Arquivos necessários para criar um ambiente de testes para o AWS Guard Duty
 
+# Artigo
+[Guard Duty Lab - Medium](https://lucasbello747.medium.com/aws-guard-duty-fa%C3%A7a-a-melhor-prova-de-conceito-para-seu-cliente-cac470d76473)
+
 
 
                             __...------------._
