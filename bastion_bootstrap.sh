@@ -1,6 +1,6 @@
 PROGRAM='Linux Bastion'
 
-##################################### Functions Definitions
+##################################### Definindo Funções
 function checkos () {
     platform='unknown'
     unamestr=`uname`
@@ -49,13 +49,13 @@ function osrelease () {
 }
 
 function harden_ssh_security () {
-    # Allow ec2-user only to access this folder and its content
+    #Permitir que o usuário ec2 apenas acesse esta pasta e seu conteúdo
     #chmod -R 770 /var/log/bastion
     #setfacl -Rdm other:0 /var/log/bastion
 
-    # Make OpenSSH execute a custom script on logins
+    # Faça o OpenSSH executar um script personalizado nos logins
     echo -e "\nForceCommand /usr/bin/bastion/shell" >> /etc/ssh/sshd_config
-    # LOGGING CONFIGURATION
+    # Configuração de Login
     mkdir -p /var/log/bastion
     mkdir -p /usr/bin/bastion
 
@@ -69,7 +69,7 @@ function harden_ssh_security () {
 cat <<'EOF' >> /usr/bin/bastion/shell
 bastion_mnt="/var/log/bastion"
 bastion_log="bastion.log"
-# Check that the SSH client did not supply a command. Only SSH to instance should be allowed.
+# Verifique se o cliente SSH não forneceu um comando. Somente SSH para instância deve ser permitido.
 export Allow_SSH="ssh"
 if [[ -z $SSH_ORIGINAL_COMMAND ]] || [[ $SSH_ORIGINAL_COMMAND =~ ^$Allow_SSH ]]; then
 #Allow ssh to instance and log connection
@@ -81,16 +81,16 @@ echo "$LOG_ORIGINAL_COMMAND" >> "${bastion_mnt}/${bastion_log}"
 log_dir="/var/log/bastion/"
 script -qf /tmp/messages --command=/bin/bash
 else
-# The "script" program could be circumvented with some commands 
-# (e.g. bash, nc). Therefore, I intentionally prevent users
-# from supplying commands.
+# O programa "script" pode ser contornado com alguns comandos
+# (por exemplo, bash, nc). Portanto, eu intencionalmente evito os usuários
+# de fornecer comandos.
 
 echo "This bastion supports interactive sessions only. Do not supply a command"
 exit 1
 fi
 EOF
 
-    # Make the custom script executable
+    # Torne o script personalizado executável
     chmod a+x /usr/bin/bastion/shell
 
     release=$(osrelease)
